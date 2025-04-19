@@ -14,7 +14,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -125,15 +124,18 @@ public class Main {
 
                     System.out.println("Insira o Email: ");
                     String email = scanner.nextLine();
-                    Optional<User> userOpt = listaDeUsuarios.findAll().stream()
-                            .filter(user -> user.getEmail().equals(email))
-                            .findFirst();
-                    if (!userOpt.isPresent()) {
+                    User user = null;
+                    for (User u : listaDeUsuarios.findAll()) {
+                        if (u.getEmail().equals(email)) {
+                            user = u;
+                            break;
+                        }
+                    }
+
+                    if (user == null) {
                         System.out.println("Usuário não encontrado :(");
                         break;
                     }
-                    User user = userOpt.get();
-
 
                     System.out.println("Insira o ID do produto (caso seja mais de um produto separar os IDs por ,): ");
                     String[] idProduto = scanner.nextLine().split(",");
@@ -141,9 +143,9 @@ public class Main {
                     for (String id : idProduto) {
                         try {
                             UUID productId = UUID.fromString(id.trim());
-                            Optional<Product> acharProduto = listaDeProdutos.findById(productId);
-                            if (acharProduto.isPresent()) {
-                                produtoCarrinho.add(acharProduto.get());
+                            Product produto = listaDeProdutos.findById(productId).orElse(null);
+                            if (produto != null) {
+                                produtoCarrinho.add(produto);
                             } else {
                                 System.out.println("Produto não encontrado :(");
                             }
