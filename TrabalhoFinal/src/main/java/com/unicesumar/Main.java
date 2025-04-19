@@ -26,14 +26,13 @@ public class Main {
 
         Connection conn = null;
 
-        // Parâmetros de conexão
         String url = "jdbc:sqlite:database.sqlite";
 
-        // Tentativa de conexão
+
         try {
             conn = DriverManager.getConnection(url);
             if (conn != null) {
-                // Criar tabela de vendas se não existir
+
                 Statement stmt = conn.createStatement();
                 String createSalesTable = "CREATE TABLE IF NOT EXISTS sales (" +
                         "id TEXT PRIMARY KEY, " +
@@ -68,7 +67,7 @@ public class Main {
             System.out.println("6 - Sair");
             System.out.println("Escolha uma opção: ");
             option = scanner.nextInt();
-            scanner.nextLine(); // Consumir a nova linha
+            scanner.nextLine();
 
             switch (option) {
                 case 1:
@@ -79,7 +78,7 @@ public class Main {
                     System.out.println("Digite o preço: ");
                     double valorProduto;
                     valorProduto = scanner.nextDouble();
-                    scanner.nextLine(); // Consumir a nova linha após o preço
+                    scanner.nextLine();
                     listaDeProdutos.save(new Product(productName, valorProduto));
                     System.out.println("Produto cadastrado :)");
                     System.out.println("===================================================");
@@ -123,7 +122,7 @@ public class Main {
                     System.out.println("===================================================");
                     System.out.println("Realizar Venda");
 
-                    // Buscar usuário por e-mail
+
                     System.out.println("Insira o Email: ");
                     String email = scanner.nextLine();
                     Optional<User> userOpt = listaDeUsuarios.findAll().stream()
@@ -135,7 +134,7 @@ public class Main {
                     }
                     User user = userOpt.get();
 
-                    // Buscar produtos por IDs
+
                     System.out.println("Insira o ID do produto (caso seja mais de um produto separar os IDs por ,): ");
                     String[] idProduto = scanner.nextLine().split(",");
                     List<Product> produtoCarrinho = new ArrayList<>();
@@ -157,20 +156,20 @@ public class Main {
                         break;
                     }
 
-                    System.out.println("Produtos selecionado:");
-                    produtoCarrinho.forEach(p -> System.out.println("- " + p.getName() + " (R$ " + p.getPrice() + ")"));
+                    System.out.println("Produtos escolhido:");
+                    produtoCarrinho.forEach(p -> System.out.println("-> " + p.getName() + " (R$ " + p.getPrice() + ")"));
 
-                    // Calcular valor total
+
                     double total = produtoCarrinho.stream().mapToDouble(Product::getPrice).sum();
 
-                    // Escolher forma de pagamento
-                    System.out.println("Escolha a forma de pagamento:");
+
+                    System.out.println("Qual é a forma de pagamento:");
                     System.out.println("1 - Cartão de Crédito");
                     System.out.println("2 - Boleto");
                     System.out.println("3 - PIX");
                     System.out.println("Opção: ");
                     int paymentOption = scanner.nextInt();
-                    scanner.nextLine(); // Consumir a nova linha
+                    scanner.nextLine();
 
                     PaymentType paymentType;
                     switch (paymentOption) {
@@ -184,22 +183,21 @@ public class Main {
                             paymentType = PaymentType.PIX;
                             break;
                         default:
-                            System.out.println("Forma de pagamento inválida! Usando PIX como padrão.");
+                            System.out.println("Forma de pagamento inválida :(");
                             paymentType = PaymentType.PIX;
                     }
 
-                    // Processar pagamento usando Strategy e Factory
                     PaymentManager paymentManager = new PaymentManager();
                     paymentManager.setPaymentMethod(PaymentMethodFactory.create(paymentType));
                     System.out.println("===================================================");
                     System.out.println("Efetuando pagamento.......");
                     paymentManager.pay(total);
                     System.out.println("Pagamento confirmado :) ");
-                    // Registrar a venda no banco usando SaleRepository
+
                     Sale sale = new Sale(user.getUuid(), produtoCarrinho, total, paymentType);
                     listaDeVendas.save(sale);
 
-                    // Exibir resumo da venda
+
                     System.out.println("\nResumo da venda:");
                     System.out.println("Cliente: " + user.getName());
                     System.out.println("Produtos:");
@@ -213,7 +211,7 @@ public class Main {
                     System.out.println("Saindo...");
                     break;
                 default:
-                    System.out.println("Opção inválida. Tente novamente");
+                    System.out.println("Opção incorreta :(");
             }
 
         } while (option != 6);
